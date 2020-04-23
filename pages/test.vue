@@ -3,15 +3,16 @@
     <ul v-for="(post, i) in posts.items" :key="i">
       <li>{{ post.fields.title }}</li>
       <ul>
-        <li>{{ post.fields.content }}</li>
-        <li>{{ post.fields.updateDate }}</li>
+        <li v-html="toHtmlString(post.fields.body)" />
+        <li> {{ post.fields.entryDate }} </li>
       </ul>
     </ul>
-    <div>json: {{ posts }}</div>
   </section>
 </template>
 
 <script>
+import format from 'date-fns/format'
+import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
 import client from '~/plugins/contentful'
 
 export default {
@@ -19,10 +20,18 @@ export default {
     let posts = []
     await client.getEntries({
       content_type: process.env.POST_TYPE_ID,
-      order: '-fields.updateDate'
+      order: '-fields.entryDate'
     }).then(res => (posts = res))
     return {
       posts
+    }
+  },
+  methods: {
+    toHtmlString (obj) {
+      return documentToHtmlString(obj)
+    },
+    dateToStr (str) {
+      return format(str, 'YYYY/M/D')
     }
   }
 }
