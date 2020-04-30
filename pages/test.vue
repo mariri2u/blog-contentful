@@ -1,12 +1,17 @@
 <template>
   <section class="section">
-    <ul v-for="(post, i) in posts.items" :key="i">
-      <li>{{ post.fields.title }}</li>
-      <ul>
-        <li v-html="toHtmlString(post.fields.body)" />
-        <li> {{ post.fields.entryDate }} </li>
-      </ul>
-    </ul>
+    <div class="columns is-mobile" v-for="(post, i) in posts.items" :key="i">
+      <nuxt-link v-bind:to="{ name: 'slug', params: { slug: post.fields.slug }}">
+        <card
+          v-bind:title='post.fields.title'
+          icon="cellphone-link"
+        >
+          slug: {{ post.fields.slug }}<br/>
+          id: {{ post.sys.id }}<br/>
+          entry: {{ post.fields.entryDate }}<br/>
+        </card>
+      </nuxt-link>
+    </div>
   </section>
 </template>
 
@@ -14,8 +19,12 @@
 import format from 'date-fns/format'
 import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
 import client from '~/plugins/contentful'
+import Card from '~/components/Card'
 
 export default {
+  components: {
+    Card
+  },
   async asyncData ({ env }) {
     let posts = []
     await client.getEntries({
